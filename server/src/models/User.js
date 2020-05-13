@@ -16,12 +16,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
     minlength: 3,
     default: 'Anônimo'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
-})
+}, { timestamps: true })
 
 UserSchema.pre('save', function(next) {
   if(!this.isModified('password'))

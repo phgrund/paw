@@ -17,6 +17,7 @@ module.exports = {
 
     if(await user.comparePassword(password)) {
       return res.json({
+        user,
         token: createUserToken(user._id)
       })
     }
@@ -64,5 +65,16 @@ module.exports = {
       ...user,
       password: undefined
     })
+  },
+  async update(req, res) {
+    const { email, password, name } = req.body
+    const { user } = req.locals
+
+    user.save({
+      email,
+      password,
+      name
+    })
+
   }
 }
