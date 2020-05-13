@@ -6,7 +6,7 @@ const cors = require('cors')
 
 const app = express()
 
-mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@clusterapi-wtrf6.gcp.mongodb.net/test?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb://localhost:27017/paw`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true
