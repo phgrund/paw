@@ -3,14 +3,34 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
   {
     path: '/',
-    name: 'Login',
-    component: () => import('../views/Login.vue'),
-    meta: {
-      guest: true
-    }
+    component: () => import('../layouts/Auth.vue'),
+    children: [
+      {
+        path: '',
+        redirect: {
+          name: 'Login'
+        }
+      },
+      {
+        path: 'login',
+        name: 'Login',
+        component: () => import('../components/Login.vue'),
+        meta: {
+          guest: true
+        }
+      },
+      {
+        path: 'registrar',
+        name: 'Register',
+        component: () => import('../components/Register.vue'),
+        meta: {
+          guest: true
+        }
+      }
+    ]
   },
   {
     path: '/home',
@@ -19,7 +39,7 @@ Vue.use(VueRouter)
       {
         path: '',
         name: 'Home',
-        component: () => import('../views/Home.vue')
+        component: () => import('../views/Home.vue'),
       },
       {
         path: 'perfil',
@@ -34,6 +54,16 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  let token = localStorage.getItem('token')
+  if (!to.meta.guest && !token) {
+    next({
+      name: 'Login'
+    })
+  }
+  next()
 })
 
 export default router

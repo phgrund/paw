@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+const path = require('path')
 
 const app = express()
 
@@ -27,6 +28,8 @@ mongoose.connection.on('disconnected', () => {
 app.use(cors())
 app.use(express.json())
 app.use('/api', require('./routes'))
+
+app.use(express.static(path.join(__dirname, '../../client/dist')))
 
 const PORT = process.env.PORT || 5000
 

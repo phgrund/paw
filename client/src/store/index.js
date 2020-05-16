@@ -17,15 +17,19 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    teste() {
+      console.log('teste')
+    },
     setLogin({ commit }, { user, token }) {
       commit('SET_USER', user)
       commit('SET_TOKEN', token)
       localStorage.setItem('token', token)
     },
-    logout({ commit }) {
+    logout({ commit }, { vm }) {
       commit('SET_USER', null)
       commit('SET_TOKEN', null)
       localStorage.removeItem('token')
+      vm.$axios.defaults.headers['Authorization'] = undefined
     }
   },
   modules: {

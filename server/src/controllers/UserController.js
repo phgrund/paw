@@ -16,6 +16,7 @@ module.exports = {
     }
 
     if(await user.comparePassword(password)) {
+      user.password = undefined
       return res.json({
         user,
         token: createUserToken(user._id)
@@ -32,7 +33,7 @@ module.exports = {
     return res.json(users)
   },
   async show(req, res) {
-    const { _id: id } = req.params
+    const { user_id: id } = req.params
 
     try {
       let user = id ? await User.findById(id) : res.locals.user
@@ -46,19 +47,29 @@ module.exports = {
   },
   async store(req, res) {
     let { email, password, name } = req.body
+
+    if(!email || !password) {
+      return res.status(422).json({
+        error: 'Dados insuficientes'
+      })
+    }
+
     let user = await User.findOne({ email })
+
     if(user) {
       return res.status(409).json({
         error: 'Email já cadastrado'
       })
     }
+
     try {
       user = await User.create({
         email,
-        password
+        password,
+        name
       })
     } catch(error) {
-      return res.json({ error })
+      return res.status(500).json({ error })
     }
 
     return res.status(201).json({

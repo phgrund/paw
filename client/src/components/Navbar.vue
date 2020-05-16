@@ -25,12 +25,12 @@
 export default {
   computed: {
     name() {
-      return this.$store.state.user.name
+      return (this.$store.state.user && this.$store.state.user.name) || 'Anônimo'
     }
   },
   methods: {
     logout() {
-      this.$store.dispatch('logout')
+      this.$store.dispatch('logout', { vm: this })
       this.$router.push({ name: 'Login' })
     }
   }
@@ -40,7 +40,8 @@ export default {
 <style scoped>
 nav {
   width: 100%;
-  background-color: #e7e7e7;
+  background-color: #2d2d2d;
+  position: fixed;
 }
 ul {
   margin: 0;
@@ -56,14 +57,15 @@ li {
 
 li a {
   display: block;
-  color: #666;
+  color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  transition: .5s all;
 }
 
 li a:hover {
-  background-color: #d4d4d4;
+  background-color: #3b3b3b;
 }
 
 .active,

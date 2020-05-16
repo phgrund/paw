@@ -1,18 +1,8 @@
 <template>
   <div class="login">
-    <form @submit.prevent="submitLogin">
-      <div class="form-block">
-        <label for="email">Login</label>
-        <input type="text" id="email" v-model="user.email">
-      </div>
-      <div class="form-block">
-        <label for="email">Senha</label>
-        <input type="password" id="password" v-model="user.password">
-      </div>
-      <div class="form-block">
-        <button type="submit">Logar</button>
-      </div>
-    </form>
+    <div class="form">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -35,6 +25,7 @@ export default {
           password
         })
         this.$store.dispatch('setLogin', { user, token })
+        this.$axios.defaults.headers['Authorization'] = `Bearer ${token}`
         this.$router.push({ name: 'Home' })
       } catch(err) {
         console.log(err)
@@ -44,9 +35,13 @@ export default {
 }
 </script>
 
-<style scoped>
-form {
+<style>
+.form {
   margin: 0 auto;
+  border: 1px solid rgb(160, 160, 160);
+  border-radius: 5px;
+  padding: 20px 40px;
+  background-color: #f1f1f1;
 }
 
 .login {
@@ -55,6 +50,7 @@ form {
   display: flex;
   align-items: center;
   justify-items: center;
+  background-color: #e9e9e9;
 }
 
 .form-block {
@@ -66,7 +62,6 @@ form {
 .form-block label {
   display: block;
   align-items: center;
-  text-align: left;
 }
 
 .form-block input {

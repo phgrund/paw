@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard">
     <navbar />
-    <router-view />
+    <div class="container">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -14,6 +16,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.container {
+  position: fixed;
+  top: 47px;
+  width: 100%;
+  height: calc(100vh - 47px);
+  background-color: #e9e9e9;
+  padding: 10px;
+  overflow: auto;
+}
 </style>
