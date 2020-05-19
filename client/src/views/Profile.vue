@@ -8,11 +8,25 @@
       Email:
       {{ user.email }}
     </div>
+    <div class="info">
+      Gênero:
+      {{ user.genre }}
+    </div>
+    <div class="info">
+      Idade:
+      {{ user.age || 'Não especificado' }}
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    id: {
+      type: String,
+      default: ''
+    }
+  },
   data: () => ({
     user: {}
   }),
@@ -21,8 +35,13 @@ export default {
   },
   methods: {
     async getUser() {
-      let { data } = await this.$axios.get('user')
+      let { data } = await this.$axios.get('user/' + this.id)
       this.user = data
+    }
+  },
+  watch: {
+    id() {
+      this.getUser()
     }
   }
 }

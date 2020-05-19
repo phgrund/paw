@@ -42,9 +42,10 @@ const routes = [
         component: () => import('../views/Home.vue'),
       },
       {
-        path: 'perfil',
+        path: 'perfil/:id?',
         name: 'Profile',
-        component: () => import('../views/Profile.vue')
+        component: () => import('../views/Profile.vue'),
+        props: true
       }
     ]
   }
@@ -61,6 +62,11 @@ router.beforeEach((to, from, next) => {
   if (!to.meta.guest && !token) {
     next({
       name: 'Login'
+    })
+  }
+  if((to.name === 'Login' || to.name == 'Register') && token) {
+    next({
+      name: 'Home'
     })
   }
   next()

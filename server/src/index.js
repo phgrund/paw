@@ -27,9 +27,11 @@ mongoose.connection.on('disconnected', () => {
 
 app.use(cors())
 app.use(express.json())
-app.use('/api', require('./routes'))
-
 app.use(express.static(path.join(__dirname, '../../client/dist')))
+app.use('/api', require('./routes'))
+app.use((req, res, next) => {
+  res.redirect('/')
+})
 
 const PORT = process.env.PORT || 5000
 

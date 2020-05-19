@@ -46,9 +46,9 @@ module.exports = {
     }
   },
   async store(req, res) {
-    let { email, password, name } = req.body
+    let { email, password, name, genre, age } = req.body
 
-    if(!email || !password) {
+    if(!email || !password || !name) {
       return res.status(422).json({
         error: 'Dados insuficientes'
       })
@@ -66,7 +66,9 @@ module.exports = {
       user = await User.create({
         email,
         password,
-        name
+        name,
+        genre,
+        age
       })
     } catch(error) {
       return res.status(500).json({ error })

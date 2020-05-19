@@ -3,14 +3,16 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from 'axios'
-axios.defaults.baseURL = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:5000/api/'
-  : 'http://4fbd5341.ngrok.io/api/'
+
+import icon from 'vue-icon'
+Vue.use(icon)
+
+// axios.defaults.baseURL =  'http://localhost:5000/api/'
+axios.defaults.baseURL =  'http://44e9919e.ngrok.io/api/'
 
 Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
-
 
 axios.interceptors.response.use(
   (response) => response,

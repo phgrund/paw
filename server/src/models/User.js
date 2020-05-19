@@ -5,7 +5,11 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    validate: {
+      validator: v => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v),
+      message: props => `${props.value} is not a valid phone number!`
+    }
   },
   password: {
     type: String,
@@ -15,7 +19,15 @@ const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 3,
-    default: 'Anônimo'
+    required: true
+  },
+  genre: {
+    type: String,
+    enum: ['Masculino', 'Feminino', 'Indefinido'],
+    default: 'Indefinido'
+  },
+  age: {
+    type: Number
   }
 }, { timestamps: true })
 

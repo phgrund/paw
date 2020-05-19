@@ -2,11 +2,11 @@
   <form @submit.prevent="submitLogin">
     <div class="form-block">
       <label for="email">Login</label>
-      <input type="text" id="email" v-model="user.email">
+      <input type="text" id="email" v-model="user.email" required>
     </div>
     <div class="form-block">
       <label for="email">Senha</label>
-      <input type="password" id="password" v-model="user.password">
+      <input type="password" id="password" v-model="user.password" required>
     </div>
     <div class="form-block">
       <div>
