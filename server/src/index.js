@@ -30,6 +30,7 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, '../../client/dist')))
 app.use('/api', require('./routes'))
 app.use((req, res, next) => {
+  console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
   res.redirect('/')
 })
 

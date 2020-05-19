@@ -5,12 +5,13 @@ module.exports = {
     let { user_id: user } = req.params
     let query = {}
     user && (query.user = user)
-    let messages = await Message.find(query).populate('user').sort('-createdAt')
+    let messages = await Message.find(query).populate('user')//.sort('-createdAt')
 
     return res.json(messages)
   },
   async store(req, res) {
     let { content, anonymous } = req.body
+    content = content.trim()
     if(!content) {
       return res.status(422).json({
         error: 'A mensagem não pode estar vazia'

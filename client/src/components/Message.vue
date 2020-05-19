@@ -31,7 +31,7 @@
             @click="cancelEdit"
             class="action-cancel"
           >
-            <icon name="delete" />
+            <icon name="x" />
           </button>
         </template>
         <button
@@ -105,7 +105,7 @@ export default {
 
 .message-content {
   color: #444;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .message-time {
@@ -136,28 +136,28 @@ export default {
   background-color: rgba(100, 100, 100, .1);
 }
 
-.action-delete {
+.action-delete:hover {
   color: red;
 }
 
 .action-edit {
-  color: blue;
+  /* color: blue; */
 }
 
-.action-save {
+.action-save:hover {
   color: green;
 }
 
-.action-cancel {
+.action-cancel:hover {
   color: orange;
 }
 
 button > .icon {
-  width: 11px;
+  width: 12px;
 }
 
 .profile-link {
-  font-size: 16px;
+  font-size: 15px;
   text-decoration: none;
   color: black;
 }

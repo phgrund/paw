@@ -40,7 +40,7 @@ export default {
 <style scoped>
 nav {
   width: 100%;
-  background-color: #2d2d2d;
+  background-color: #128C7E;
   position: fixed;
 }
 ul {
@@ -65,7 +65,7 @@ li a {
 }
 
 li a:hover {
-  background-color: #3b3b3b;
+  background-color: rgb(21, 167, 150);
 }
 
 .active,

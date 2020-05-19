@@ -42,7 +42,7 @@ export default {
         this.$axios.defaults.headers['Authorization'] = `Bearer ${token}`
         this.$router.push({ name: 'Home' })
       } catch(err) {
-        console.log(err)
+        alert('Login ou senha incorretos')
       }
     }
   }

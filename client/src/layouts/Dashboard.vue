@@ -22,7 +22,7 @@ export default {
   top: 47px;
   width: 100%;
   height: calc(100vh - 47px);
-  background-color: #e9e9e9;
+  background-color: white;
   padding: 10px;
   overflow: auto;
 }
