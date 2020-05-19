@@ -145,7 +145,7 @@ export default {
 
 .message-box {
   height: 400px;
-  max-height: 70vh;
+  max-height: 60vh;
   overflow: auto;
   position: relative;
   /* background-color: #f0e6dd; */
