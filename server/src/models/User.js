@@ -28,6 +28,13 @@ const UserSchema = new mongoose.Schema({
   },
   age: {
     type: Number
+  },
+  status: {
+    type: String,
+    default: 'Disponível'
+  },
+  photoUrl: {
+    type: String
   }
 }, { timestamps: true })
 

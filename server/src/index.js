@@ -29,6 +29,8 @@ app.use(cors())
 app.use(express.json())
 app.use(express.static(path.join(__dirname, '../../client/dist')))
 app.use('/api', require('./routes'))
+app.use(express.static(path.join(__dirname, '../public')))
+console.log(path.join(__dirname, '../public'))
 app.use((req, res, next) => {
   console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
   res.redirect('/')

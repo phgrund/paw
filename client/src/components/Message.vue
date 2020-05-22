@@ -1,49 +1,15 @@
 <template>
-  <div class="message">
-    <template v-if="!isOwnMessage">
-      <router-link v-if="message.user" class="profile-link" :to="{ name: 'Profile', params: { id: message.user._id } }">
-        {{ message.user.name }}
-      </router-link>
-      <div v-else class="profile-link">
-        Anônimo
+  <div :class="['chat-row', message.sent ? 'sent-message' : 'received-message']">
+    <div class="chat-bubble">
+      <div v-if="!message.sent" class="message-owner">
+        {{ username }}
       </div>
-    </template>
-    <div class="message-content" :contenteditable="editMode" @input="e => newMessage = e.target.textContent">
-      {{ message.content }}
-    </div>
-    <div class="info">
-      <template v-if="isOwnMessage">
-        <button
-          v-if="!editMode"
-          @click="editMode = true"
-          class="action-edit"
-        >
-          <icon name="edit-2" />
-        </button>
-        <template v-else>
-          <button
-            @click="editMessage"
-            class="action-save"
-          >
-            <icon name="check" />
-          </button>
-          <button
-            @click="cancelEdit"
-            class="action-cancel"
-          >
-            <icon name="x" />
-          </button>
-        </template>
-        <button
-          @click="deleteMessage"
-          class="action-delete"
-        >
-          <icon name="trash" />
-        </button>
-      </template>
-      <div class="message-time">
-        {{ formatDateTime(message.createdAt) }}
+      <div class="message-content">
+        {{ message.content }}
       </div>
+      <span class="chat-time">
+        {{ time }}
+      </span>
     </div>
   </div>
 </template>
@@ -64,6 +30,19 @@ export default {
     editMode: false,
     newMessage: ''
   }),
+  computed: {
+    time() {
+      let time = this.message.createdAt.split('T').pop()
+      time = time.split('.').shift()
+      let [hour, mins] = time.split(':')
+      return `${hour}:${mins}`
+    },
+    username() {
+      return this.message.user
+        ? this.message.user.name
+        : 'Anônimo'
+    }
+  },
   methods: {
     async deleteMessage() {
       await this.$axios.delete(`message/${this.message._id}`)
@@ -82,83 +61,86 @@ export default {
     cancelEdit() {
       this.newMessage = ''
       this.editMode = false
-    },
-    formatDateTime(str) {
-      let [date, time] = str.split('T')
-      time = time.split('.').shift()
-      let [year, month, day] = date.split('-')
-      let [hour, mins] = time.split(':')
-      return `${day}/${month}/${year} ás ${hour}:${mins}`
     }
   }
 }
 </script>
 
 <style scoped>
-.message {
-  border: 1px solid #DDD;
-  border-radius: 10px;
-  padding: 4px 8px 17px;
-  position: relative;
-  min-width: 150px;
+.chat-row {
+  width: 100%;
+  display: flex;
+  margin-top: 3px;
+}
+
+.message-owner {
+  font-weight: 600;
+  margin-bottom: 1px;
 }
 
 .message-content {
-  color: #444;
   font-size: 14px;
 }
 
-.message-time {
-  font-size: 10px;
+.received-message {
+  justify-content: flex-start;
 }
 
-.info {
-  position: absolute;
-  bottom: 0;
-  right: 2px;
+.received-message > .chat-bubble {
+  background-color: white;
 }
 
-.info > * {
+.sent-message {
+  justify-content: flex-end;
+}
+
+.sent-message > .chat-bubble {
+  background-color: #dcf8c6;
+}
+
+.chat-bubble {
+  padding: 6px 50px 8px 9px;
+  background-color: white;
+  border-bottom: #c7c0b9;
+  margin-top: 2px;
   display: inline-block;
-  margin-left: 2px;
+  max-width: 75%;
+  border-radius: 7.5px;
+  color: #303030;
+  justify-self: flex-end;
+  position: relative;
 }
 
-.info > button {
-  cursor: pointer;
-  transition: background-color .3s;
-  border-radius: 50%;
-  border: none;
-  background-color: transparent;
-  padding: 1px;
+.chat-bubble:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
 }
 
-.info > button:hover {
-  background-color: rgba(100, 100, 100, .1);
+.sent-message > .chat-bubble:before {
+  border-left: 8px solid #dcf8c6;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #dcf8c6;
+  border-bottom: 8px solid transparent;
+  right: -8px;
+  top: 0;
 }
 
-.action-delete:hover {
-  color: red;
+.received-message > .chat-bubble:before {
+  border-left: 8px solid transparent;
+  border-right: 8px solid white;
+  border-top: 8px solid white;
+  border-bottom: 8px solid transparent;
+  left: -8px;
+  top: 0;
 }
 
-.action-edit {
-  /* color: blue; */
-}
-
-.action-save:hover {
-  color: green;
-}
-
-.action-cancel:hover {
-  color: orange;
-}
-
-button > .icon {
-  width: 12px;
-}
-
-.profile-link {
-  font-size: 15px;
-  text-decoration: none;
-  color: black;
+.chat-time {
+  position: absolute;
+  bottom: 0px;
+  right: 2px;
+  color: rgba(0, 0, 0, .45);
+  font-size: 11px;
 }
 </style>

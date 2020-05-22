@@ -14,7 +14,7 @@
 }
 
 html {
-  font-family: 'Roboto', sans-serif;
+  font-family: Segoe UI,Helvetica Neue,Helvetica,Lucida Grande,Arial,Ubuntu,Cantarell,Fira Sans,sans-serif;
   scroll-behavior: smooth;
 }
 </style>

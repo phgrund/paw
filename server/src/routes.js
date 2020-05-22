@@ -1,6 +1,8 @@
 const { Router } = require('express')
 const router = new Router()
 
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 const auth = require('./middlewares/auth')
 
 const UserController = require('./controllers/UserController')
@@ -13,6 +15,8 @@ router.post('/login', UserController.login)
 router.get('/users', auth, UserController.index)
 router.get('/user/:user_id?', auth, UserController.show)
 router.post('/user', UserController.store)
+router.put('/user', auth, UserController.update)
+router.post('/user/upload', auth, upload.single('avatar'), UserController.upload)
 
 // Mensagens
 router.get('/messages', auth, MessageController.index)

@@ -8,7 +8,7 @@ import icon from 'vue-icon'
 Vue.use(icon)
 
 // axios.defaults.baseURL =  'http://localhost:5000/api/'
-axios.defaults.baseURL =  'http://44e9919e.ngrok.io/api/'
+axios.defaults.baseURL =  'http://3c038159.ngrok.io/api/'
 
 Vue.prototype.$axios = axios
 
@@ -34,9 +34,7 @@ new Vue({
     if (token) {
       this.$axios.defaults.headers['Authorization'] = `Bearer ${token}`
       const { data } = await this.$axios.get('user')
-      console.log(data)
       this.$store.commit('SET_USER', data)
     }
-    console.log(process.env)
   }
 }).$mount('#app')

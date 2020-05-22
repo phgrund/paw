@@ -1,8 +1,19 @@
-const jwt = require('jsonwebtoken')
+// File Handler
+const path = require('path')
+const { promisify } = require('util')
+const fs = require('fs')
+const unlink = promisify(fs.unlink)
+const rename = promisify(fs.rename)
+const rootPath = path.join(__dirname, '../../')
+const uploadPath = path.join(rootPath, 'public')
 
 const User = require('../models/User')
 
+const jwt = require('jsonwebtoken')
+
 const createUserToken = (id) => jwt.sign({ id }, process.env.JWT_KEY, { expiresIn: '30d' })
+
+const avatarFormats = ['jpg', 'jpeg', 'webp', 'gif', 'png']
 
 module.exports = {
   async login(req, res) {
@@ -48,6 +59,8 @@ module.exports = {
   async store(req, res) {
     let { email, password, name, genre, age } = req.body
 
+    console.log(password)
+
     if(!email || !password || !name) {
       return res.status(422).json({
         error: 'Dados insuficientes'
@@ -80,14 +93,44 @@ module.exports = {
     })
   },
   async update(req, res) {
-    const { email, password, name } = req.body
-    const { user } = req.locals
+    const { user } = res.locals
 
-    user.save({
-      email,
-      password,
-      name
+    let newUser = await User.findByIdAndUpdate(user._id, req.body, {
+      useFindAndModify: false,
+      new: true
     })
+
+    return res.json(newUser)
+  },
+  async upload(req, res) {
+    const { file } = req
+    const { user } = res.locals
+
+    let ext = file.originalname.split('.').pop()
+
+    if(!ext || !avatarFormats.includes(ext)) {
+      return res.status(422).json({
+        error: 'Formato de imagem inválido'
+      })
+    }
+
+    let oldPath = path.join(rootPath, file.path)
+    let newPath = path.join(uploadPath, user._id.toString())
+
+    try {
+      await rename(oldPath, `${newPath}.${ext}`)
+
+      user.photoUrl = `\/${user._id.toString()}.${ext}`
+      await user.save()
+
+      return res.json(user)
+    } catch(err) {
+      await unlink(oldPath)
+
+      return res.status(500).json({
+        error: 'Ocorreu um erro'
+      })
+    }
 
   }
 }
