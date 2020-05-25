@@ -52,9 +52,18 @@ export default {
   }),
   methods: {
     async submitRegister() {
-      let { name, email, password, password_confirmation, genre, age } = this.user
-      if(!email || !password) return
-      if(password !== password_confirmation) return
+      let { name, email, password, password_confirmation, genre, age = 0 } = this.user
+      let errors = []
+
+      !email.trim() && errors.push('Por favor, digite um e-mail')
+      !name.trim() && errors.push('Por favor, digite um nome')
+      !password.trim() && errors.push('Por favor, digite uma senha')
+      password !== password_confirmation && errors.push('As senhas não conferem')
+      age < 0 && errors.push('Idade inválida')
+
+      if(errors.length > 0) {
+        return alert(errors.join('\n'))
+      }
 
       try {
         await this.$axios.post('user', {
@@ -68,7 +77,7 @@ export default {
           name: 'Login'
         })
       } catch(err) {
-        console.log(err)
+        alert(err)
       }
     }
   }

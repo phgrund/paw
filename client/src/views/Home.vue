@@ -174,9 +174,9 @@
 <script>
 import io from 'socket.io-client'
 
-// const socket = io.connect('http://135fcda5.ngrok.io', {
-  const socket = io.connect('http://localhost:5000', {
-    autoConnect: false
+// const socket = io.connect('http://2c6b8f27.ngrok.io', {
+const socket = io.connect('http://localhost:5000', {
+  autoConnect: false
 })
 
 import Message from '../components/Message.vue'
@@ -266,9 +266,10 @@ export default {
       socket.on('destroy-message', id => {
         this.destroyMessage(id)
       })
-    },
-    teste(e) {
-      console.log(e.target.textContent)
+
+      socket.on('new-user', user => {
+        this.users.push(user)
+      })
     },
     async getUsers() {
       let { data } = await this.$axios.get('users')
@@ -325,7 +326,7 @@ export default {
         },
         onUploadProgress: (progress) => {
           let percentage = Math.round((progress.loaded * 100) / progress.total)
-          console.log(percentage)
+          console.log(percentage, '%')
         }
       })
 
@@ -390,7 +391,7 @@ export default {
       this.updateMessage(_id, content)
     },
     updateMessage(_id, content) {
-      let message = this.messages.find(message => message._id = _id)
+      let message = this.messages.find(message => message._id === _id)
       message && (message.content = content)
     },
     async deleteMessage() {

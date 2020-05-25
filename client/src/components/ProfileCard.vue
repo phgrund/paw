@@ -2,7 +2,7 @@
   <div class="profile-card" @click="$emit('profileClick', user)">
     <div class="profile-avatar">
       <img
-        :src="user.photoUrl || 'https://p2.trrsf.com/image/fget/cf/1200/1200/filters:quality(85)/images.terra.com/2019/04/09/mc-zoi-de-gato.jpeg'"
+        :src="user.photoUrl"
         alt="Imagem"
         class="img-avatar"
       />
@@ -62,14 +62,12 @@ export default {
 .profile-avatar {
   width: 60px;
   height: 100%;
-  /* background-color: black; */
 }
 
 .profile-content {
   width: 100%;
-  padding: 10px 16px;
+  padding: 0px 16px;
   display: flex;
-  align-items: flex-start;
   flex-direction: column;
   position: relative;
 }
@@ -84,6 +82,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
 .img-avatar {

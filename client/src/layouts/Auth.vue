@@ -38,10 +38,10 @@ export default {
 <style>
 .form {
   margin: 0 auto;
-  border: 1px solid rgb(160, 160, 160);
   border-radius: 5px;
-  padding: 20px 40px;
-  background-color: #f1f1f1;
+  padding: 40px 60px;
+  background-color: white;
+  border: 1px solid #075E54;
 }
 
 .login {
@@ -50,13 +50,22 @@ export default {
   display: flex;
   align-items: center;
   justify-items: center;
-  background-color: #e9e9e9;
+  background-color: #F9F9F9;
 }
 
 .form-block {
   display: block;
   margin-bottom: 15px;
   text-align: center;
+  color: #009688;
+  font-size: 14px;
+}
+
+.form-block a {
+  text-decoration: none;
+  font-size: 17px;
+  color: #075E54;
+  font-weight: 600;
 }
 
 .form-block label {
@@ -70,14 +79,18 @@ export default {
 
 .form-block button {
   padding: 7px 15px;
-  border: none;
+  border: 1px solid #075E54;
+  border-radius: 5px;
+  background-color: transparent;
   transition: 0.5s all;
   margin: 0 auto;
   text-align: center;
+  color: #075E54;
+  font-size: 18px;
 }
 
 .form-block button:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 </style>

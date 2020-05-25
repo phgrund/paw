@@ -30,5 +30,10 @@ module.exports = {
     connections.forEach(connection => {
       io.to(connection).emit('destroy-message', message)
     })
+  },
+  newUser(user) {
+    connections.forEach(connection => {
+      io.to(connection).emit('new-user', user)
+    })
   }
 }

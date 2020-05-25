@@ -12,6 +12,8 @@ const createUserToken = (id) => jwt.sign({ id }, process.env.JWT_KEY, { expiresI
 
 const avatarFormats = ['jpg', 'jpeg', 'webp', 'gif', 'png']
 
+const { newUser } = require('../websocket')
+
 module.exports = {
   async login(req, res) {
     const { email, password } = req.body
@@ -82,8 +84,13 @@ module.exports = {
       return res.status(500).json({ error })
     }
 
+    newUser({
+      ...user._doc,
+      password: undefined
+    })
+
     return res.status(201).json({
-      ...user,
+      ...user._doc,
       password: undefined
     })
   },

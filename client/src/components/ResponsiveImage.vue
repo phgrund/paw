@@ -46,9 +46,6 @@ export default {
       }
     }
   },
-  created() {
-    console.log((this.ratioY / this.ratioX) * 100)
-  },
   methods: {
     devImage(e) {
       e.target.src = 'http://localhost:5000/' + e.target.src.split('/').pop()
