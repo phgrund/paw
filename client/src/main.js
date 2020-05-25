@@ -7,8 +7,8 @@ import axios from 'axios'
 import icon from 'vue-icon'
 Vue.use(icon)
 
-// axios.defaults.baseURL =  'http://localhost:5000/api/'
-axios.defaults.baseURL =  'http://3c038159.ngrok.io/api/'
+axios.defaults.baseURL =  'http://localhost:5000/api/'
+// axios.defaults.baseURL =  'http://135fcda5.ngrok.io/api/'
 
 Vue.prototype.$axios = axios
 

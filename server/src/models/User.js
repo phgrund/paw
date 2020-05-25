@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: v => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v),
-      message: props => `${props.value} is not a valid phone number!`
+      message: props => `${props.value} não é um email válido!`
     }
   },
   password: {
@@ -23,8 +23,8 @@ const UserSchema = new mongoose.Schema({
   },
   genre: {
     type: String,
-    enum: ['Masculino', 'Feminino', 'Indefinido'],
-    default: 'Indefinido'
+    enum: ['Masculino', 'Feminino'],
+    required: true
   },
   age: {
     type: Number
@@ -34,7 +34,8 @@ const UserSchema = new mongoose.Schema({
     default: 'Disponível'
   },
   photoUrl: {
-    type: String
+    type: String,
+    default: '/default_avatar.png'
   }
 }, { timestamps: true })
 

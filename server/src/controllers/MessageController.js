@@ -1,10 +1,16 @@
+const mongoose = require('mongoose')
 const Message = require('../models/Message')
+
+const { sendMessage, updateMessage, destroyMessage } = require('../websocket')
 
 module.exports = {
   async index(req, res) {
-    let { user_id: user } = req.params
+    let { user } = req.query
     let query = {}
-    user && (query.user = user)
+
+    if(user && mongoose.Types.ObjectId.isValid(user)) {
+      query.user = user
+    }
     let messages = await Message.find(query).populate('user')//.sort('-createdAt')
 
     return res.json(messages)
@@ -23,6 +29,11 @@ module.exports = {
     let message = await Message.create({
       content,
       user: anonymous ? null : user._id
+    })
+
+    sendMessage({
+      ...message._doc,
+      user: anonymous ? null : user
     })
 
     return res.status(201).json({
@@ -53,6 +64,8 @@ module.exports = {
 
     await message.save()
 
+    updateMessage(message)
+
     return res.json(message)
   },
   async destroy(req, res) {
@@ -67,10 +80,15 @@ module.exports = {
       })
     }
 
-    await message.remove()
+    try {
+      await message.remove()
+      destroyMessage(id)
+      return res.json({
+        message: 'Mensagem deletada com sucesso.'
+      })
+    } catch(err) {
+      console.log(err)
+    }
 
-    return res.json({
-      message: 'Mensagem deletada com sucesso.'
-    })
   }
 }

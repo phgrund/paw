@@ -4,10 +4,23 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const path = require('path')
+const { setupWebSocket } = require('./websocket')
 
 const app = express()
+const server = require('http').Server(app)
 
-mongoose.connect(`mongodb://localhost:27017/paw`, {
+setupWebSocket(server)
+
+// const io = require('socket.io')(http)
+
+// io.on('connection', (socket) => {
+//   socket.emit('message', {
+//     content: '123'
+//   })
+//   console.log('connected')
+// })
+
+mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true
@@ -38,6 +51,6 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`)
 })

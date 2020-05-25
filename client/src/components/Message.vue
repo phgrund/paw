@@ -1,6 +1,6 @@
 <template>
   <div :class="['chat-row', message.sent ? 'sent-message' : 'received-message']">
-    <div class="chat-bubble">
+    <div class="chat-bubble" @click="messageClick">
       <div v-if="!message.sent" class="message-owner">
         {{ username }}
       </div>
@@ -61,6 +61,14 @@ export default {
     cancelEdit() {
       this.newMessage = ''
       this.editMode = false
+    },
+    messageClick() {
+      this.message.sent && this.$emit('messageClick', this.message)
+    }
+  },
+  sockets: {
+    connect() {
+      console.log('connect')
     }
   }
 }
@@ -109,6 +117,7 @@ export default {
   color: #303030;
   justify-self: flex-end;
   position: relative;
+  cursor: pointer;
 }
 
 .chat-bubble:before {

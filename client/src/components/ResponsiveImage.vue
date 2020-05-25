@@ -1,6 +1,10 @@
 <template>
   <div class="container" :style="containerStyle">
-    <img class="img" :style="imgStyle" :src="src" />
+    <img
+      :src="src"
+      class="img"
+      :style="imgStyle"
+    />
   </div>
 </template>
 
@@ -44,6 +48,11 @@ export default {
   },
   created() {
     console.log((this.ratioY / this.ratioX) * 100)
+  },
+  methods: {
+    devImage(e) {
+      e.target.src = 'http://localhost:5000/' + e.target.src.split('/').pop()
+    }
   }
 }
 </script>

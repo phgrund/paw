@@ -1,10 +1,17 @@
 <template>
   <div class="home">
+    <modal @close="closeMessage" v-model="editMessage">
+      <form @click.prevent="saveMessage">
+        <input v-model="selectedMessage.content" type="text">
+        <button type="submit">Salvar</button>
+        <button @click="deleteMessage">Deletar</button>
+      </form>
+    </modal>
     <aside>
       <div class="profile-header">
         <img
           @click="left = true"
-          :src="user.photoUrl || 'https://p2.trrsf.com/image/fget/cf/1200/1200/filters:quality(85)/images.terra.com/2019/04/09/mc-zoi-de-gato.jpeg'"
+          :src="user.photoUrl"
           alt="Imagem"
           class="img-avatar"
         >
@@ -15,6 +22,7 @@
           v-for="user in users"
           :key="user._id"
           :user="user"
+          @profileClick="openProfile"
         />
       </div>
       <div class="profile-edit" :style="menuStyle">
@@ -29,7 +37,7 @@
           </div>
           <div class="profile-edit-container">
             <div class="profile-avatar">
-              <responsive-image style="cursor: pointer" @click.native="$refs.uploadPhoto.click()" round :src="user.photoUrl || 'https://www.24hnoticias.com/thumb/19/1/b/8/1b82333039089c2dc067ecc22f8db154.jpg'" />
+              <responsive-image style="cursor: pointer" @click.native="$refs.uploadPhoto.click()" round :src="user.photoUrl" />
             </div>
             <input v-show="false" @input="uploadPhoto" ref="uploadPhoto" type="file" />
             <div class="profile-edit-info">
@@ -54,11 +62,6 @@
     </aside>
     <main>
       <div class="chat-header">
-        <!-- <img
-          src="https://p2.trrsf.com/image/fget/cf/1200/1200/filters:quality(85)/images.terra.com/2019/04/09/mc-zoi-de-gato.jpeg"
-          alt="Imagem"
-          class="img-avatar"
-        > -->
         <div style="width: 100%">
           Mensagens
         </div>
@@ -66,42 +69,83 @@
           <icon name="log-out" />
         </button>
       </div>
-      <div class="chat-container" ref="chat">
-          <message
-            v-for="message in messages"
-            :key="message._id"
-            :message="message"
-          />
-        </div>
-        <form class="chat-actions" @submit.prevent="sendMessage">
-          <div class="chat-input-anonymous">
-            <input v-model="anonymous" type="checkbox">
-            Anônimo
-          </div>
-          <div class="chat-input-message">
-            <input v-model="newMessage" type="text" placeholder="Digite sua mensagem">
-          </div>
-          <div class="chat-input-send">
-            <button type="submit">
-              <icon name="send" />
+      <div class="profile-info" :style="infoStyle">
+        <div v-show="right">
+          <div class="profile-info-top">
+            <button @click="closeProfile">
+              <icon name="x" />
             </button>
+            <div class="avatar-container">
+              <responsive-image style="cursor: pointer" round :src="selectedUser.photoUrl" />
+            </div>
+            <div class="profile-info-name">
+              {{ selectedUser.name }}
+            </div>
+            <div class="profile-info-description">
+              {{ selectedUser.status }}
+            </div>
+            <div class="profile-info-info">
+              <!-- {{ selectedUser.messages }} -->
+              <div class="header">
+                Mensagens
+              </div>
+              <div
+                v-for="message in selectedUser.messages"
+                :key="message._id"
+                class="info"
+              >
+                {{ message.content }}
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
+      </div>
+      <div class="chat-container" v-show="true" ref="chat">
+        <message
+          v-for="(message, i) in messages"
+          :key="i"
+          :message="message"
+          @messageClick="openMessage"
+        />
+      </div>
+      <form class="chat-actions" @submit.prevent="sendMessage">
+        <div class="chat-input-anonymous">
+          <input v-model="anonymous" type="checkbox">
+          Anônimo
+        </div>
+        <div class="chat-input-message">
+          <input v-model="newMessage" type="text" placeholder="Digite sua mensagem">
+        </div>
+        <div class="chat-input-send">
+          <button type="submit">
+            <icon name="send" />
+          </button>
+        </div>
+      </form>
     </main>
   </div>
 </template>
 
 <script>
+import io from 'socket.io-client'
+
+// const socket = io.connect('http://135fcda5.ngrok.io', {
+  const socket = io.connect('http://localhost:5000', {
+    autoConnect: false
+})
+
 import Message from '../components/Message.vue'
 import ProfileCard from '../components/ProfileCard.vue'
 import ResponsiveImage from '../components/ResponsiveImage.vue'
+import Modal from '../components/Modal'
 
 export default {
   name: 'Home',
   components: {
     Message,
     ProfileCard,
-    ResponsiveImage
+    ResponsiveImage,
+    Modal
   },
   data: () => ({
     users: [],
@@ -109,7 +153,11 @@ export default {
     newMessage: '',
     anonymous: false,
     left: false,
-    editUsername: false
+    right: false,
+    editUsername: false,
+    editMessage: false,
+    selectedUser: {},
+    selectedMessage: {}
   }),
   computed: {
     user() {
@@ -121,18 +169,63 @@ export default {
           ? '100%'
           : '0px'
       }
+    },
+    infoStyle() {
+      return {
+        width: this.right
+          ? '350px'
+          : '0px'
+      }
     }
+  },
+  created() {
+    window.onbeforeunload = () => {
+      socket.emit('leave', {
+        user: this.user
+      })
+    }
+    socket.io.opts.query = {
+      user: JSON.stringify(this.user)
+    }
+    socket.connect()
   },
   mounted() {
     this.getMessages()
     this.getUsers()
+    this.socket()
   },
   methods: {
+    socket() {
+      socket.on('connect', () => {
+        console.log('Connected')
+      })
+      socket.on('new-message', message => {
+        this.messages.push({
+          ...message,
+          sent: message.user && this.user
+            ? message.user._id === this.user._id
+            : false
+        })
+        this.scrollBottom()
+      })
+
+      socket.on('update-message', message => {
+        this.updateMessage(message._id, message.content)
+      })
+
+      socket.on('destroy-message', id => {
+        this.destroyMessage(id)
+      })
+    },
     async getUsers() {
       let { data } = await this.$axios.get('users')
 
-      this.users = data.filter(user => user._id !== this.$store.state.user._id)
-
+      this.users = data
+        .filter(user => user._id !== this.$store.state.user._id)
+        .map(user => ({
+          ...user,
+          photoUrl: user.photoUrl + '?t=' + new Date().getTime()
+        }))
     },
     async getMessages() {
       let { data } = await this.$axios.get('messages')
@@ -151,15 +244,11 @@ export default {
       this.newMessage = this.newMessage.trim()
       if(!this.newMessage) return
 
-      let { data } = await this.$axios.post('message', {
+      await this.$axios.post('message', {
         content: this.newMessage,
         anonymous: this.anonymous
       })
 
-      this.messages.push({
-        ...data,
-        sent: !this.anonymous
-      })
       this.newMessage = ''
 
       this.scrollBottom()
@@ -180,10 +269,17 @@ export default {
       let { data } = await this.$axios.post('user/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progress) => {
+          let percentage = Math.round((progress.loaded * 100) / progress.total)
+          console.log(percentage)
         }
       })
 
-      this.$store.state.user = data
+      this.$store.state.user = {
+        ...data,
+        photoUrl: data.photoUrl + '?t=' + new Date().getTime()
+      }
     },
     async logout() {
       await this.$store.dispatch('logout', { vm: this })
@@ -200,8 +296,55 @@ export default {
     },
     scrollBottom() {
       this.$nextTick(() => {
-        this.$refs['chat'].scrollTop = this.$refs['chat'].scrollHeight
+        if(this.$refs.chat) {
+          this.$refs['chat'].scrollTop = this.$refs['chat'].scrollHeight
+        }
       })
+    },
+    devImage(e) {
+      e.target.src = 'http://localhost:5000/' + e.target.src.split('/').pop()
+    },
+    async openProfile(user) {
+      this.selectedUser = {
+        ...user,
+        messages: (await this.$axios.get('messages', {
+          params: {
+            user: user._id
+          }
+        })).data
+      }
+      this.right = true
+    },
+    closeProfile() {
+      this.selectedUser = {}
+      this.right = false
+    },
+    openMessage(message) {
+      this.selectedMessage = { ...message }
+      this.editMessage = true
+    },
+    closeMessage() {
+      this.selectedMessage = {}
+    },
+    async saveMessage() {
+      let { _id, content } = this.selectedMessage
+      await this.$axios.put(`message/${this.selectedMessage._id}`, { content })
+      this.updateMessage(_id, content)
+    },
+    updateMessage(_id, content) {
+      let message = this.messages.find(message => message._id = _id)
+      message && (message.content = content)
+    },
+    async deleteMessage() {
+      let { _id } = this.selectedMessage
+      await this.$axios.delete(`message/${_id}`)
+      this.destroyMessage(_id)
+      this.closeMessage()
+      this.editMessage = false
+    },
+    destroyMessage(_id) {
+      let index = this.messages.findIndex(message => message._id === _id)
+      index > -1 && this.messages.splice(index, 1)
     }
   }
 }
@@ -233,16 +376,16 @@ export default {
 }
 
 aside {
-  width: 350px;
-  max-width: 350px;
+  width: 300px;
   height: 100%;
   border-right: 1px solid #e0e0e0;
   position: relative;
 }
 
 main {
-  width: 100%;
+  width: calc(100% - 300px);
   height: 100%;
+  position: relative;
 }
 
 .img-avatar {
@@ -280,13 +423,56 @@ main {
   overflow-x: hidden;
 }
 
+.profile-info {
+  position: absolute;
+  height: calc(100% - 60px);
+  top: 60px;
+  right: 0;
+  background-color: #ededed;
+  z-index: inherit;
+  z-index: 1;
+  transition: 0.2s;
+  overflow-x: hidden;
+}
+
 .profile-edit-top {
   height: 110px;
   background-color: #00bfa5;
   color: white;
   display: flex;
   align-items: flex-end;
-  padding: 10px 25px;
+}
+
+.profile-info-top {
+  margin: 0 auto;
+  padding: 25px 40px;
+  background-color: white;
+}
+
+.avatar-container {
+  width: 75%;
+  margin: 0 auto;
+  padding-top: 25px;
+}
+
+.profile-info-name {
+  margin-top: 15px;
+  font-size: 19px;
+}
+
+.profile-info-description {
+  margin-top: 5px;
+}
+
+.profile-info-top > button {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  width: 25px;
+  background-color: transparent;
+  border: none;
+  color: #919191;
+  cursor: pointer;
 }
 
 .profile-edit-container {
@@ -311,6 +497,34 @@ main {
 .profile-edit-info > .edit {
   color: #4a4a4a;
   padding: 10px 0;
+}
+
+.profile-info-info {
+  margin-top: 20px;
+  background-color: white;
+  text-align: left;
+}
+
+.profile-info-info > .header {
+  color: #009688;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.profile-info-info > .info {
+  margin-top: 7px;
+  color: #4a4a4a;
+  position: relative;
+}
+
+.profile-info-info > .info:before {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  content: "";
+  height: 1px;
+  border-bottom: 1px solid #e0e0e0;
+  width: 75%;
 }
 
 .profile-edit-menu {

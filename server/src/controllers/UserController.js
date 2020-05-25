@@ -1,9 +1,6 @@
 // File Handler
 const path = require('path')
-const { promisify } = require('util')
-const fs = require('fs')
-const unlink = promisify(fs.unlink)
-const rename = promisify(fs.rename)
+const { unlink, rename } = require('fs').promises
 const rootPath = path.join(__dirname, '../../')
 const uploadPath = path.join(rootPath, 'public')
 
@@ -58,8 +55,6 @@ module.exports = {
   },
   async store(req, res) {
     let { email, password, name, genre, age } = req.body
-
-    console.log(password)
 
     if(!email || !password || !name) {
       return res.status(422).json({

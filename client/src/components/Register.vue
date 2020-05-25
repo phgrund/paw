@@ -19,7 +19,7 @@
     <div class="form-block">
       <label for="genre">Genero</label>
       <select v-model="user.genre" id="genre">
-        <option value="Indefinido">Indefinido</option>
+        <!-- <option value="Indefinido">Indefinido</option> -->
         <option value="Masculino">Masculino</option>
         <option value="Feminino">Feminino</option>
       </select>
@@ -45,7 +45,8 @@ export default {
       email: '',
       password: '',
       password_confirmation: '',
-      genre: 'Indefinido',
+      genre: 'Masculino',
+      // genre: 'Indefinido',
       age: null
     }
   }),

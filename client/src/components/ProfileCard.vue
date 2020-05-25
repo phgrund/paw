@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-card">
+  <div class="profile-card" @click="$emit('profileClick', user)">
     <div class="profile-avatar">
       <img
         :src="user.photoUrl || 'https://p2.trrsf.com/image/fget/cf/1200/1200/filters:quality(85)/images.terra.com/2019/04/09/mc-zoi-de-gato.jpeg'"
@@ -25,6 +25,11 @@ export default {
       type: Object,
       default: () => {}
     }
+  },
+  methods: {
+    devImage(e) {
+      e.target.src = 'http://localhost:5000/' + e.target.src.split('/').pop()
+    }
   }
 }
 </script>
@@ -37,6 +42,7 @@ export default {
   padding: 10px 16px;
   position: relative;
   overflow-x: hidden;
+  cursor: pointer;
 }
 
 .profile-card:before {
