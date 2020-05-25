@@ -17,4 +17,8 @@ html {
   font-family: Segoe UI,Helvetica Neue,Helvetica,Lucida Grande,Arial,Ubuntu,Cantarell,Fira Sans,sans-serif;
   scroll-behavior: smooth;
 }
+
+input:focus, textarea:focus, select:focus{
+  outline: none;
+}
 </style>

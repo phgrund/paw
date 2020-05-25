@@ -1,10 +1,49 @@
 <template>
   <div class="home">
-    <modal @close="closeMessage" v-model="editMessage">
-      <form @click.prevent="saveMessage">
-        <input v-model="selectedMessage.content" type="text">
-        <button type="submit">Salvar</button>
-        <button @click="deleteMessage">Deletar</button>
+    <!-- Editar/Excluir Mensagem -->
+    <modal @close="closeMessage" v-model="editMessage" background-color="#dcf8c6">
+      <div class="header">
+        Editar Mensagem
+      </div>
+      <form class="edit-message" @submit.prevent="saveMessage">
+        <button class="close" @click="editMessage = false">
+          <icon name="x" />
+        </button>
+        <div @input="e => newEditMessage = e.target.textContent" class="edit" contenteditable="true" v-html="selectedMessage.content" />
+        <div class="actions">
+          <button type="submit">Salvar</button>
+          <button @click="deleteMessage">Deletar</button>
+        </div>
+      </form>
+    </modal>
+    <!-- Editar nome de usuário -->
+    <modal v-model="editName" background-color="#dcf8c6">
+      <div class="header">
+        Editar Nome de Usuário
+      </div>
+      <form class="edit-message" @submit.prevent="saveName">
+        <button class="close" @click="editName = false">
+          <icon name="x" />
+        </button>
+        <div @input="e => newEditName = e.target.textContent" class="edit" contenteditable="true" v-html="user.name" />
+        <div class="actions">
+          <button type="submit">Salvar</button>
+        </div>
+      </form>
+    </modal>
+    <!-- Editar status do usuário -->
+    <modal v-model="editStatus" background-color="#dcf8c6">
+      <div class="header">
+        Editar Status
+      </div>
+      <form class="edit-message" @submit.prevent="saveStatus">
+        <button class="close" @click="editStatus = false">
+          <icon name="x" />
+        </button>
+        <div @input="e => newEditStatus = e.target.textContent" class="edit" contenteditable="true" v-html="user.status" />
+        <div class="actions">
+          <button type="submit">Salvar</button>
+        </div>
       </form>
     </modal>
     <aside>
@@ -43,16 +82,22 @@
             <div class="profile-edit-info">
               <div class="header">
                 Seu Nome
+                <button @click="editName = true">
+                  <icon name="edit-3" />
+                </button>
               </div>
-              <div class="edit" :contenteditable="editUsername">
+              <div class="edit">
                 {{ user.name }}
               </div>
             </div>
             <div class="profile-edit-info">
               <div class="header">
                 Status
+                <button @click="editStatus = true">
+                  <icon name="edit-3" />
+                </button>
               </div>
-              <div class="edit" :contenteditable="editUsername">
+              <div class="edit">
                 {{ user.status }}
               </div>
             </div>
@@ -156,8 +201,13 @@ export default {
     right: false,
     editUsername: false,
     editMessage: false,
+    editName: false,
+    editStatus: false,
     selectedUser: {},
-    selectedMessage: {}
+    selectedMessage: {},
+    newEditMessage: '',
+    newEditName: '',
+    newEditStatus: ''
   }),
   computed: {
     user() {
@@ -216,6 +266,9 @@ export default {
       socket.on('destroy-message', id => {
         this.destroyMessage(id)
       })
+    },
+    teste(e) {
+      console.log(e.target.textContent)
     },
     async getUsers() {
       let { data } = await this.$axios.get('users')
@@ -321,13 +374,18 @@ export default {
     },
     openMessage(message) {
       this.selectedMessage = { ...message }
+      this.newEditMessage = message.content
       this.editMessage = true
     },
     closeMessage() {
       this.selectedMessage = {}
     },
     async saveMessage() {
-      let { _id, content } = this.selectedMessage
+      let { _id } = this.selectedMessage
+      let content = this.newEditMessage
+
+      if(!content.trim()) return
+
       await this.$axios.put(`message/${this.selectedMessage._id}`, { content })
       this.updateMessage(_id, content)
     },
@@ -345,6 +403,18 @@ export default {
     destroyMessage(_id) {
       let index = this.messages.findIndex(message => message._id === _id)
       index > -1 && this.messages.splice(index, 1)
+    },
+    async saveName() {
+      let name = this.newEditName
+      if(!name.trim()) return
+      await this.$axios.put('user', { name })
+      this.user.name = name
+    },
+    async saveStatus() {
+      let status = this.newEditStatus
+      if(!status.trim()) return
+      await this.$axios.put('user', { status })
+      this.user.status = status
     }
   }
 }
@@ -486,6 +556,18 @@ main {
   padding: 14px 30px;
   background-color: white;
   text-align: left;
+}
+
+.profile-edit-info > .edit {
+  position: relative;
+}
+
+.profile-edit-info > .header > button {
+  width: 15px;
+  background: transparent;
+  border: none;
+  color: #075E54;
+  cursor: pointer;
 }
 
 .profile-edit-info > .header {
@@ -640,29 +722,38 @@ main {
   background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
 }
 
-.message-row {
-  max-width: 100%;
+.edit-message > .edit {
+  margin-top: 5px;
+  display: block;
+  padding: 10px 8px;
+  border: 1px solid #075E54;
+  border-radius: 7px;
+  width: 300px;
+}
+
+.edit-message > .close {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  width: 20px;
+  border: none;
+  background-color: transparent;
+  color: #075E54;
+}
+
+.edit-message > .actions {
   display: flex;
-  padding: 5px 10px;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
-.message-left {
-  justify-content: flex-start;
-}
-
-.message-left > .message {
-  background-color: white;
-  text-align: left;
-  border-radius: 10px 10px 10px 0;
-}
-
-.message-right {
-  justify-content: flex-end;
-}
-
-.message-right > .message {
-  background-color: #e1fec6;
-  text-align: right;
-  border-radius: 10px 10px 0 10px;
+.edit-message > .actions > button {
+  padding: 8px 13px;
+  border: 1px solid #075E54;
+  background-color: #128C7E;
+  border-radius: 3px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
 </style>

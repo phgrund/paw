@@ -118,6 +118,7 @@ export default {
   justify-self: flex-end;
   position: relative;
   cursor: pointer;
+  overflow-wrap: break-word;
 }
 
 .chat-bubble:before {

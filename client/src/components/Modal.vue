@@ -1,7 +1,6 @@
 <template>
   <div v-show="val" class="modal">
-    <div class="modal-content">
-      <div @click="val = false" class="close">&times;</div>
+    <div class="modal-content" :style="contentStyle">
       <slot />
     </div>
   </div>
@@ -13,6 +12,10 @@ export default {
     value: {
       type: Boolean,
       default: false
+    },
+    'background-color': {
+      type: String,
+      default: 'white'
     }
   },
   computed: {
@@ -26,6 +29,11 @@ export default {
           this.$emit('close')
         }
       }
+    },
+    contentStyle() {
+      return {
+        backgroundColor: this['backgroundColor']
+      }
     }
   }
 }
@@ -38,22 +46,21 @@ export default {
   align-items: center;
   justify-content: center;
   position: fixed;
-  z-index: 1;
+  z-index: 2;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,0.6);
 }
 
 .modal-content {
   display: inline-block;
-  background-color: #fefefe;
   margin: 15% auto;
   padding: 20px 35px;
   border: 1px solid #888;
+  border-radius: 5px;
   position: relative;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
   animation-name: animatetop;
