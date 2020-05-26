@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- Editar/Excluir Mensagem -->
-    <modal @close="closeMessage" v-model="editMessage" background-color="#dcf8c6">
+    <modal @close="closeMessage" v-model="editMessage">
       <div class="header">
         Editar Mensagem
       </div>
@@ -17,7 +17,7 @@
       </form>
     </modal>
     <!-- Editar nome de usuário -->
-    <modal v-model="editName" background-color="#dcf8c6">
+    <modal v-model="editName">
       <div class="header">
         Editar Nome de Usuário
       </div>
@@ -32,7 +32,7 @@
       </form>
     </modal>
     <!-- Editar status do usuário -->
-    <modal v-model="editStatus" background-color="#dcf8c6">
+    <modal v-model="editStatus">
       <div class="header">
         Editar Status
       </div>
@@ -114,7 +114,7 @@
           <icon name="log-out" />
         </button>
       </div>
-      <div class="profile-info" :style="infoStyle">
+      <!-- <div class="profile-info" :style="infoStyle">
         <div v-show="right">
           <div class="profile-info-top">
             <button @click="closeProfile">
@@ -130,7 +130,6 @@
               {{ selectedUser.status }}
             </div>
             <div class="profile-info-info">
-              <!-- {{ selectedUser.messages }} -->
               <div class="header">
                 Mensagens
               </div>
@@ -144,7 +143,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="chat-container" v-show="true" ref="chat">
         <message
           v-for="(message, i) in messages"
@@ -168,6 +167,37 @@
         </div>
       </form>
     </main>
+    <div class="profile-info" :style="infoStyle">
+        <div v-show="right">
+          <div class="profile-info-header" />
+          <div class="profile-info-top">
+            <button @click="closeProfile">
+              <icon name="x" />
+            </button>
+            <div class="avatar-container">
+              <responsive-image style="cursor: pointer" round :src="selectedUser.photoUrl" />
+            </div>
+            <div class="profile-info-name">
+              {{ selectedUser.name }}
+            </div>
+            <div class="profile-info-description">
+              {{ selectedUser.status }}
+            </div>
+            <div class="profile-info-info">
+              <div class="header">
+                Mensagens
+              </div>
+              <div
+                v-for="message in selectedUser.messages"
+                :key="message._id"
+                class="info"
+              >
+                {{ message.content }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -269,6 +299,10 @@ export default {
 
       socket.on('new-user', user => {
         this.users.push(user)
+      })
+
+      socket.on('update-user', user => {
+        this.updateUser(user._id, user)
       })
     },
     async getUsers() {
@@ -416,6 +450,13 @@ export default {
       if(!status.trim()) return
       await this.$axios.put('user', { status })
       this.user.status = status
+    },
+    updateUser(_id, payload) {
+      let user = this.users.find(user => user._id === _id)
+      if(user) {
+        user = Object.assign(user, payload)
+        user.photoUrl += '?t=' + new Date().getTime()
+      }
     }
   }
 }
@@ -454,7 +495,7 @@ aside {
 }
 
 main {
-  width: calc(100% - 300px);
+  flex: 1;
   height: 100%;
   position: relative;
 }
@@ -495,15 +536,24 @@ main {
 }
 
 .profile-info {
-  position: absolute;
-  height: calc(100% - 60px);
-  top: 60px;
+  position: relative;
+  width: 300px;
+  height: 100%;
   right: 0;
   background-color: #ededed;
   z-index: inherit;
   z-index: 1;
   transition: 0.2s;
   overflow-x: hidden;
+}
+
+.profile-info-header {
+  width: 100%;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  background-color: #ededed;
+  z-index: 1;
 }
 
 .profile-edit-top {
@@ -516,8 +566,9 @@ main {
 
 .profile-info-top {
   margin: 0 auto;
-  padding: 25px 40px;
+  padding: 0 40px 20px;
   background-color: white;
+  position: relative;
 }
 
 .avatar-container {
@@ -538,7 +589,7 @@ main {
 .profile-info-top > button {
   position: absolute;
   top: 5px;
-  left: 10px;
+  right: 10px;
   width: 25px;
   background-color: transparent;
   border: none;
@@ -615,6 +666,7 @@ main {
   display: flex;
   align-items: center;
   font-size: 19px;
+  margin-left: 20px;
 }
 
 .profile-edit-menu > button {
@@ -622,7 +674,7 @@ main {
   border: none;
   background-color: transparent;
   color: white;
-  margin-right: 29px;
+  margin-right: 10px;
   cursor: pointer;
 }
 

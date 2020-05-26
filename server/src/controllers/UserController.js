@@ -12,7 +12,7 @@ const createUserToken = (id) => jwt.sign({ id }, process.env.JWT_KEY, { expiresI
 
 const avatarFormats = ['jpg', 'jpeg', 'webp', 'gif', 'png']
 
-const { newUser } = require('../websocket')
+const { newUser, updateUser } = require('../websocket')
 
 module.exports = {
   async login(req, res) {
@@ -101,6 +101,8 @@ module.exports = {
       useFindAndModify: false,
       new: true
     })
+
+    updateUser(newUser)
 
     return res.json(newUser)
   },
