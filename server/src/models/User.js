@@ -23,11 +23,17 @@ const UserSchema = new mongoose.Schema({
   },
   genre: {
     type: String,
-    enum: ['Masculino', 'Feminino'],
+    enum: [
+      'Masculino',
+      'Feminino',
+      'Não Binário',
+      'Genderfluid'
+    ],
     required: true
   },
   age: {
-    type: Number
+    type: Number,
+    min: 0
   },
   status: {
     type: String,

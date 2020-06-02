@@ -69,11 +69,13 @@ export default {
   padding: 0px 16px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   position: relative;
 }
 
 .user-name {
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 .user-status {

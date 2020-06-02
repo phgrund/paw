@@ -3,6 +3,7 @@ const router = new Router()
 
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
+
 const auth = require('./middlewares/auth')
 
 const UserController = require('./controllers/UserController')

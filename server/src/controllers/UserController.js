@@ -127,6 +127,8 @@ module.exports = {
       user.photoUrl = `\/${user._id.toString()}.${ext}`
       await user.save()
 
+      updateUser(user)
+
       return res.json(user)
     } catch(err) {
       await unlink(oldPath)

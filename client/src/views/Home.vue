@@ -108,48 +108,19 @@
     <main>
       <div class="chat-header">
         <div style="width: 100%">
-          Mensagens
+          ChatZap
         </div>
         <button @click="logout">
           <icon name="log-out" />
         </button>
       </div>
-      <!-- <div class="profile-info" :style="infoStyle">
-        <div v-show="right">
-          <div class="profile-info-top">
-            <button @click="closeProfile">
-              <icon name="x" />
-            </button>
-            <div class="avatar-container">
-              <responsive-image style="cursor: pointer" round :src="selectedUser.photoUrl" />
-            </div>
-            <div class="profile-info-name">
-              {{ selectedUser.name }}
-            </div>
-            <div class="profile-info-description">
-              {{ selectedUser.status }}
-            </div>
-            <div class="profile-info-info">
-              <div class="header">
-                Mensagens
-              </div>
-              <div
-                v-for="message in selectedUser.messages"
-                :key="message._id"
-                class="info"
-              >
-                {{ message.content }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
       <div class="chat-container" v-show="true" ref="chat">
         <message
           v-for="(message, i) in messages"
           :key="i"
           :message="message"
-          @messageClick="openMessage"
+          @sentClick="openMessage"
+          @receivedClick="openProfile"
         />
       </div>
       <form class="chat-actions" @submit.prevent="sendMessage">
@@ -204,7 +175,6 @@
 <script>
 import io from 'socket.io-client'
 
-// const socket = io.connect('http://2c6b8f27.ngrok.io', {
 const socket = io.connect('http://localhost:5000', {
   autoConnect: false
 })
@@ -393,6 +363,7 @@ export default {
       e.target.src = 'http://localhost:5000/' + e.target.src.split('/').pop()
     },
     async openProfile(user) {
+      if(!user) return
       this.selectedUser = {
         ...user,
         messages: (await this.$axios.get('messages', {
@@ -423,6 +394,7 @@ export default {
 
       await this.$axios.put(`message/${this.selectedMessage._id}`, { content })
       this.updateMessage(_id, content)
+      this.editMessage = false
     },
     updateMessage(_id, content) {
       let message = this.messages.find(message => message._id === _id)
@@ -444,12 +416,14 @@ export default {
       if(!name.trim()) return
       await this.$axios.put('user', { name })
       this.user.name = name
+      this.editName = false
     },
     async saveStatus() {
       let status = this.newEditStatus
       if(!status.trim()) return
       await this.$axios.put('user', { status })
       this.user.status = status
+      this.editStatus = false
     },
     updateUser(_id, payload) {
       let user = this.users.find(user => user._id === _id)
@@ -521,6 +495,7 @@ main {
   display: flex;
   align-items: center;
   padding: 10px 16px;
+  text-transform: capitalize;
 }
 
 .profile-edit {
@@ -580,6 +555,7 @@ main {
 .profile-info-name {
   margin-top: 15px;
   font-size: 19px;
+  text-transform: capitalize;
 }
 
 .profile-info-description {

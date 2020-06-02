@@ -23,7 +23,15 @@ module.exports = (req, res, next) => {
         error: 'Sessão expirada, favor logar novamente'
       })
 
-    res.locals.user = await User.findById(decoded.id)
+    let user = await User.findById(decoded.id)
+
+    if(!user) {
+      return res.status(401).json({
+        error: 'Sessão expirada, favor logar novamente'
+      })
+    }
+
+    res.locals.user = user
 
     return next()
   })

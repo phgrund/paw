@@ -22,11 +22,13 @@
         <!-- <option value="Indefinido">Indefinido</option> -->
         <option value="Masculino">Masculino</option>
         <option value="Feminino">Feminino</option>
+        <option value="Não Binário">Não Binário</option>
+        <option value="Genderfluid">Genderfluid</option>
       </select>
     </div>
     <div class="form-block">
       <label for="age">Idade</label>
-      <input style="width: 50px" type="number" id="age" v-model.number="user.age">
+      <input style="width: 50px" type="number" id="age" min="0" max="100" v-model.number="user.age">
     </div>
     <div class="form-block">
       <div style="margin-bottom: 10px">

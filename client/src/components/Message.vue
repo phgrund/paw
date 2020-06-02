@@ -63,7 +63,11 @@ export default {
       this.editMode = false
     },
     messageClick() {
-      this.message.sent && this.$emit('messageClick', this.message)
+      if(this.message.sent) {
+        this.$emit('sentClick', this.message)
+      } else {
+        this.$emit('receivedClick', this.message.user)
+      }
     }
   },
   sockets: {
@@ -84,6 +88,7 @@ export default {
 .message-owner {
   font-weight: 600;
   margin-bottom: 1px;
+  text-transform: capitalize;
 }
 
 .message-content {
